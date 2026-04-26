@@ -68,18 +68,15 @@ const stockNews = uniqueStockNews.slice(0, 15).map(item => ({
 }));
     );
 
-    res.json({
+res.json({
   updatedAt: new Date().toISOString(),
   stocks,
-
   cardNews: cardFeed.items.slice(0, 6).map((item) => ({
     title: item.title,
     link: item.link,
     published: item.pubDate
   })),
-
   stockNews,
-
   trendingCards: [
     {
       name: "Paul Skenes rookie card",
