@@ -101,7 +101,59 @@ res.json({
     });
   }
 });
+app.get("/api/ebay/search", async (req, res) => {
+  try {
+    const query = req.query.q || "baseball rookie card";
+    const limit = req.query.limit || 6;
 
+    const token = await getEbayToken();
+
+    const ebayUrl =
+      `https://api.ebay.com/buy/browse/v1/item_summary/search` +
+      `?q=${encodeURIComponent(query)}` +
+      `&limit=${limit}` +
+      `&filter=buyingOptions:{FIXED_PRICE}`;
+
+    const response = await fetch(ebayUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "X-EBAY-C-MARKETPLACE-ID": "EBAY_US"
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(500).json({
+        error: true,
+        message: "eBay search failed",
+        details: data
+      });
+    }
+
+    const items = (data.itemSummaries || []).map((item) => ({
+      title: item.title,
+      price: item.price?.value || null,
+      currency: item.price?.currency || "USD",
+      image: item.image?.imageUrl || null,
+      itemUrl: makeEbayAffiliateUrl(item.itemWebUrl, "scanner"),
+      condition: item.condition || null,
+      seller: item.seller?.username || null
+    }));
+
+    res.json({
+      updatedAt: new Date().toISOString(),
+      query,
+      count: items.length,
+      items
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: true,
+      message: "Could not load eBay listings"
+    });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Dashboard API running on port ${PORT}`);
 });
