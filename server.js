@@ -66,7 +66,7 @@ const stockNews = uniqueStockNews.slice(0, 15).map(item => ({
   link: item.link,
   published: item.pubDate
 }));
-    );
+    
 
 res.json({
   updatedAt: new Date().toISOString(),
