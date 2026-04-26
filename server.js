@@ -42,8 +42,30 @@ app.get("/api/dashboard", async (req, res) => {
       "https://news.google.com/rss/search?q=baseball+cards+rookie+cards+sports+cards"
     );
 
-    const stockFeed = await parser.parseURL(
-      "https://news.google.com/rss/search?q=stock+market+top+movers"
+    const stockFeeds = [
+  "https://news.google.com/rss/search?q=stock+market",
+  "https://news.google.com/rss/search?q=nasdaq+stocks",
+  "https://news.google.com/rss/search?q=earnings+stocks",
+  "https://news.google.com/rss/search?q=tech+stocks",
+  "https://news.google.com/rss/search?q=stock+market+today"
+];
+
+let allStockNews = [];
+
+for (const feed of stockFeeds) {
+  const parsed = await parser.parseURL(feed);
+  allStockNews = allStockNews.concat(parsed.items);
+}
+
+const uniqueStockNews = Array.from(
+  new Map(allStockNews.map(item => [item.title, item])).values()
+);
+
+const stockNews = uniqueStockNews.slice(0, 15).map(item => ({
+  title: item.title,
+  link: item.link,
+  published: item.pubDate
+}));
     );
 
     res.json({
