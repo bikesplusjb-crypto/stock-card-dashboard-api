@@ -69,22 +69,17 @@ const stockNews = uniqueStockNews.slice(0, 15).map(item => ({
     );
 
     res.json({
-      updatedAt: new Date().toISOString(),
-      stocks,
-      cardNews: cardFeed.items.slice(0, 6).map((item) => ({
-        title: item.title,
-        link: item.link,
-        published: item.pubDate
-      })),
-      res.json({
   updatedAt: new Date().toISOString(),
   stocks,
+
   cardNews: cardFeed.items.slice(0, 6).map((item) => ({
     title: item.title,
     link: item.link,
     published: item.pubDate
   })),
+
   stockNews,
+
   trendingCards: [
     {
       name: "Paul Skenes rookie card",
@@ -100,20 +95,6 @@ const stockNews = uniqueStockNews.slice(0, 15).map(item => ({
     }
   ]
 });
-        {
-          name: "Paul Skenes rookie card",
-          ebayUrl: "https://www.ebay.com/sch/i.html?_nkw=paul+skenes+rookie+card"
-        },
-        {
-          name: "Roman Anthony rookie card",
-          ebayUrl: "https://www.ebay.com/sch/i.html?_nkw=roman+anthony+rookie+card"
-        },
-        {
-          name: "Jac Caglianone rookie card",
-          ebayUrl: "https://www.ebay.com/sch/i.html?_nkw=jac+caglianone+rookie+card"
-        }
-      ]
-    });
   } catch (error) {
     console.error("Dashboard error:", error);
 
