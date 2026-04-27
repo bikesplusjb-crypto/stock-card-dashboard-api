@@ -32,11 +32,12 @@ async function getEbayToken() {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization: `Basic ${credentials}`
     },
-    body: "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope"
+    body: "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/buy.browse"
   });
 
   const data = await response.json();
-
+const data = await response.json();
+console.log("EBAY TOKEN RESPONSE:", data);
   if (!response.ok) {
     console.error("eBay token error:", data);
     throw new Error("eBay token failed");
