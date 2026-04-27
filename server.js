@@ -248,6 +248,38 @@ app.get("/api/ebay/search", async (req, res) => {
     });
   }
 });
+app.get("/api/ebay/search", async (req, res) => {
+  try {
+    const query = req.query.q || "baseball cards";
+
+    const token = await getEbayToken();
+
+    const response = await fetch(
+      `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=10`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-EBAY-C-MARKETPLACE-ID": "EBAY_US"
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    const items = (data.itemSummaries || []).map(item => ({
+      title: item.title,
+      price: item.price?.value,
+      image: item.image?.imageUrl,
+      link: item.itemWebUrl
+    }));
+
+    res.json({ items });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "eBay failed" });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Dashboard API running on port ${PORT}`);
 });
