@@ -183,13 +183,17 @@ app.get("/api/ebay/search", async (req, res) => {
       count: items.length,
       items
     });
-  } catch (error) {
-    res.status(500).json({
-      error: true,
-      message: "Could not load eBay listings"
+  catch (error) {
+  console.error("EBAY ERROR:", error);
+
+  res.status(500).json({
+    error: true,
+    message: "Could not load eBay listings",
+    details: error.message
+  });
+}
     });
-  }
-});
+  
 
 app.listen(PORT, () => {
   console.log(`Dashboard API running on port ${PORT}`);
