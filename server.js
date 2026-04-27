@@ -26,20 +26,22 @@ async function getEbayToken() {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-     Authorization: `Basic ${credentials}`,
+      "Authorization": `Basic ${credentials}`
     },
     body: "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope"
   });
 
-  const data = await response.json();
+  const text = await response.text();
 
   if (!response.ok) {
-    console.error("EBAY TOKEN ERROR:", data);
-    throw new Error("Failed to get eBay token");
+    console.error("EBAY TOKEN ERROR RAW:", text);
+    throw new Error("Token failed");
   }
 
+  const data = JSON.parse(text);
   return data.access_token;
 }
+
 
  
 
