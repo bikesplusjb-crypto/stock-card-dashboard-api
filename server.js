@@ -275,9 +275,15 @@ app.get("/api/ebay/search", async (req, res) => {
 
     res.json({ items });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "eBay failed" });
+ catch (err) {
+  console.error("EBAY FULL ERROR:", err);
+
+  res.status(500).json({
+    error: true,
+    message: "Could not load eBay listings",
+    details: err.message
+  });
+}
   }
 });
 app.listen(PORT, () => {
