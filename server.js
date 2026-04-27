@@ -37,6 +37,7 @@ async function getEbayToken() {
  
 const data = await response.json();
 console.log("EBAY TOKEN RESPONSE:", data);
+console.log("EBAY TOKEN RESPONSE:", data);
   if (!response.ok) {
     console.error("eBay token error:", data);
     throw new Error("eBay token failed");
