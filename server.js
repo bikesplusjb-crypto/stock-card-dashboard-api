@@ -183,7 +183,7 @@ app.get("/api/ebay/search", async (req, res) => {
       count: items.length,
       items
     });
-  catch (error) {
+  } catch (error) {
   console.error("EBAY ERROR:", error);
 
   res.status(500).json({
