@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const Parser = require("rss-parser");
-
+const fetch = require("node-fetch");
 const app = express();
 const parser = new Parser();
 
