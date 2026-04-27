@@ -25,9 +25,9 @@ async function getEbayToken() {
   const response = await fetch("https://api.ebay.com/identity/v1/oauth2/token", {
     method: "POST",
     headers: {
-  "Content-Type": "application/x-www-form-urlencoded",
-  Authorization: `Basic ${credentials}`
-},
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": `Basic ${credentials}`
+    },
     body: "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope"
   });
 
@@ -41,7 +41,7 @@ async function getEbayToken() {
   const data = JSON.parse(text);
   return data.access_token;
 }
-}
+
 
 
  
