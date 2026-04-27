@@ -41,6 +41,7 @@ async function getEbayToken() {
   const data = JSON.parse(text);
   return data.access_token;
 }
+}
 
 
  
