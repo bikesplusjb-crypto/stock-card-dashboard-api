@@ -34,8 +34,7 @@ async function getEbayToken() {
     },
     body: "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/buy.browse"
   });
-
-  const data = await response.json();
+ 
 const data = await response.json();
 console.log("EBAY TOKEN RESPONSE:", data);
   if (!response.ok) {
@@ -158,17 +157,17 @@ app.get("/api/ebay/search", async (req, res) => {
       }
     });
 
-    const data = await response.json();
+    const ebayData = await response.json();
 
     if (!response.ok) {
       return res.status(500).json({
         error: true,
         message: "eBay search failed",
-        details: data
+        details: ebayData
       });
     }
 
-    const items = (data.itemSummaries || []).map((item) => ({
+    const items = (ebayData.itemSummaries || []).map((item) => ({
       title: item.title,
       price: item.price?.value || null,
       currency: item.price?.currency || "USD",
