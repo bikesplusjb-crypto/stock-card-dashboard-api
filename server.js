@@ -18,9 +18,26 @@ let ebayToken = null;
 let ebayTokenExpiresAt = 0;
 
 async function getEbayToken() {
-  if (ebayToken && Date.now() < ebayTokenExpiresAt) {
-    return ebayToken;
+  const response = await fetch("https://api.ebay.com/identity/v1/oauth2/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization:
+        "Basic " +
+        Buffer.from(`${EBAY_CLIENT_ID}:${EBAY_CLIENT_SECRET}`).toString("base64"),
+    },
+    body: "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope",
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error("TOKEN ERROR:", data);
+    throw new Error("Failed to get eBay token");
   }
+
+  return data.access_token;
+}
 
   const credentials = Buffer.from(
     `${EBAY_CLIENT_ID}:${EBAY_CLIENT_SECRET}`
@@ -145,14 +162,16 @@ app.get("/api/ebay/search", async (req, res) => {
     const token = await getEbayToken();
 
     const response = await fetch(
-      `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=10`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "X-EBAY-C-MARKETPLACE-ID": "EBAY_US"
-        }
-      }
-    );
+  `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}`,
+  {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "X-EBAY-C-MARKETPLACE-ID": "EBAY_US",
+      "Content-Type": "application/json"
+    }
+  }
+);
 
     const data = await response.json();
 
