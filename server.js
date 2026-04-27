@@ -10,7 +10,43 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
+const EBAY_CLIENT_ID = process.env.EBAY_CLIENT_ID;
+const EBAY_CLIENT_SECRET = process.env.EBAY_CLIENT_SECRET;
+const EBAY_CAMPAIGN_ID = process.env.EBAY_CAMPAIGN_ID;
 
+let ebayToken = null;
+let ebayTokenExpiresAt = 0;
+
+async function getEbayToken() {
+  if (ebayToken && Date.now() < ebayTokenExpiresAt) {
+    return ebayToken;
+  }
+
+  const credentials = Buffer.from(
+    `${EBAY_CLIENT_ID}:${EBAY_CLIENT_SECRET}`
+  ).toString("base64");
+
+  const response = await fetch("https://api.ebay.com/identity/v1/oauth2/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Basic ${credentials}`
+    },
+    body: "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope"
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error("eBay token error:", data);
+    throw new Error("eBay token failed");
+  }
+
+  ebayToken = data.access_token;
+  ebayTokenExpiresAt = Date.now() + (data.expires_in - 60) * 1000;
+
+  return ebayToken;
+}
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
