@@ -39,32 +39,11 @@ async function getEbayToken() {
   return data.access_token;
 }
 
-  const credentials = Buffer.from(
-    `${EBAY_CLIENT_ID}:${EBAY_CLIENT_SECRET}`
-  ).toString("base64");
-
-  const response = await fetch("https://api.ebay.com/identity/v1/oauth2/token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: `Basic ${credentials}`
-    },
-    body: "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/buy.browse"
-  });
  
-const data = await response.json();
-console.log("EBAY TOKEN RESPONSE:", data);
-console.log("EBAY TOKEN RESPONSE:", data);
-  if (!response.ok) {
-    console.error("eBay token error:", data);
-    throw new Error("eBay token failed");
-  }
 
-  ebayToken = data.access_token;
-  ebayTokenExpiresAt = Date.now() + (data.expires_in - 60) * 1000;
 
-  return ebayToken;
-}
+
+
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
