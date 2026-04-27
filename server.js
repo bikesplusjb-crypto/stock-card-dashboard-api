@@ -26,7 +26,7 @@ async function getEbayToken() {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      "Authorization": `Basic ${credentials}`
+      Authorization: `Basic ${credentials}`
     },
     body: "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope"
   });
