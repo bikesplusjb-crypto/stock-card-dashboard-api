@@ -413,7 +413,39 @@ fetch("/api/dashboard")
 </html>
   `);
 });
+app.get("/pokemon", (req, res) => {
+  res.send(`
+    <html>
+      <head>
+        <title>Pokemon Market</title>
+      </head>
+      <body style="background:#020617;color:white;font-family:Arial;padding:20px;">
+        
+        <h1>🐉 Pokémon Card Market</h1>
 
+        <h2>🔥 Trending Cards</h2>
+        <ul>
+          <li>Charizard Base Set PSA</li>
+          <li>Pikachu Illustrator</li>
+          <li>Umbreon VMAX Alt Art</li>
+          <li>Lugia Neo Genesis</li>
+        </ul>
+
+        <h2>💰 Quick Search</h2>
+        <input id="search" placeholder="Search Pokemon card..." style="padding:10px;width:250px;">
+        <button onclick="goSearch()" style="padding:10px;background:#22c55e;border:none;color:black;">Search</button>
+
+        <script>
+          function goSearch(){
+            const q = document.getElementById('search').value;
+            window.open('https://www.ebay.com/sch/i.html?_nkw=' + q + '+pokemon+card');
+          }
+        </script>
+
+      </body>
+    </html>
+  `);
+});
 app.listen(PORT, () => {
  console.log(`Dashboard API running on port ${PORT}`);
 });
