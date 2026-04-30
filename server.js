@@ -415,35 +415,409 @@ fetch("/api/dashboard")
 });
 app.get("/pokemon", (req, res) => {
   res.send(`
-    <html>
-      <head>
-        <title>Pokemon Market</title>
-      </head>
-      <body style="background:#020617;color:white;font-family:Arial;padding:20px;">
-        
-        <h1>🐉 Pokémon Card Market</h1>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pokémon Card Market</title>
 
-        <h2>🔥 Trending Cards</h2>
-        <ul>
-          <li>Charizard Base Set PSA</li>
-          <li>Pikachu Illustrator</li>
-          <li>Umbreon VMAX Alt Art</li>
-          <li>Lugia Neo Genesis</li>
-        </ul>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #050816;
+    color: white;
+  }
 
-        <h2>💰 Quick Search</h2>
-        <input id="search" placeholder="Search Pokemon card..." style="padding:10px;width:250px;">
-        <button onclick="goSearch()" style="padding:10px;background:#22c55e;border:none;color:black;">Search</button>
+  .hero {
+    background: linear-gradient(135deg, #1d4ed8, #4f46e5, #7c3aed);
+    padding: 45px 25px;
+    text-align: center;
+  }
 
-        <script>
-          function goSearch(){
-            const q = document.getElementById('search').value;
-            window.open('https://www.ebay.com/sch/i.html?_nkw=' + q + '+pokemon+card');
-          }
-        </script>
+  .hero small {
+    color: #fde68a;
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
 
-      </body>
-    </html>
+  .hero h1 {
+    font-size: 46px;
+    margin: 12px 0;
+  }
+
+  .hero p {
+    font-size: 18px;
+    color: #dbeafe;
+    max-width: 850px;
+    margin: auto;
+  }
+
+  .wrap {
+    padding: 25px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+  }
+
+  .tab {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.2);
+    color: white;
+    padding: 12px 18px;
+    border-radius: 999px;
+    font-weight: bold;
+  }
+
+  .tab.active {
+    background: #facc15;
+    color: #111827;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    background: rgba(30,41,59,.9);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.35);
+  }
+
+  .card h2 {
+    margin: 0 0 5px;
+    font-size: 25px;
+  }
+
+  .set {
+    color: #cbd5e1;
+    margin-bottom: 18px;
+  }
+
+  .price {
+    font-size: 38px;
+    font-weight: 900;
+    color: #bbf7d0;
+    margin: 10px 0;
+  }
+
+  .change {
+    font-size: 18px;
+    font-weight: bold;
+    color: #86efac;
+  }
+
+  .signal {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 13px;
+  }
+
+  .buy {
+    background: rgba(34,197,94,.2);
+    color: #86efac;
+  }
+
+  .hold {
+    background: rgba(250,204,21,.2);
+    color: #fde68a;
+  }
+
+  .watch {
+    background: rgba(96,165,250,.2);
+    color: #bfdbfe;
+  }
+
+  .reason {
+    margin-top: 15px;
+    background: rgba(255,255,255,.08);
+    padding: 14px;
+    border-radius: 14px;
+    color: #e5e7eb;
+    line-height: 1.4;
+  }
+
+  .heat {
+    margin-top: 15px;
+  }
+
+  .bar {
+    height: 12px;
+    background: rgba(255,255,255,.15);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .fill {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #facc15, #ef4444);
+  }
+
+  .btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+
+  a.btn {
+    display: inline-block;
+    background: #22c55e;
+    color: #052e16;
+    text-decoration: none;
+    padding: 11px 14px;
+    border-radius: 12px;
+    font-weight: 900;
+  }
+
+  a.btn.secondary {
+    background: #38bdf8;
+    color: #082f49;
+  }
+
+  .section-title {
+    margin-top: 35px;
+    font-size: 28px;
+  }
+
+  .search-box {
+    background: rgba(30,41,59,.9);
+    padding: 22px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+  }
+
+  input {
+    padding: 14px;
+    width: min(420px, 90%);
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+  }
+
+  button {
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: none;
+    background: #22c55e;
+    font-weight: 900;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+
+  .premium {
+    margin-top: 30px;
+    background: linear-gradient(135deg, #111827, #312e81);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 24px;
+    padding: 24px;
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 {
+      font-size: 34px;
+    }
+
+    button {
+      margin-left: 0;
+      margin-top: 10px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="hero">
+  <small>POKÉMON MARKET TRACKER</small>
+  <h1>Pokémon Collectible Dashboard</h1>
+  <p>Track Pokémon card movers, heat scores, buy/hold/watch signals, sealed product trends, portfolio ideas, and live eBay searches.</p>
+</div>
+
+<div class="wrap">
+
+  <div class="tabs">
+    <div class="tab active">Movers</div>
+    <div class="tab">Heat Map</div>
+    <div class="tab">Signals</div>
+    <div class="tab">Sealed</div>
+    <div class="tab">Scanner</div>
+    <div class="tab">Portfolio</div>
+  </div>
+
+  <div class="search-box">
+    <h2>🔎 Pokémon Card Search</h2>
+    <input id="search" placeholder="Example: Charizard PSA 10" />
+    <button onclick="searchPokemon()">Search eBay</button>
+  </div>
+
+  <h2 class="section-title">🔥 Top Pokémon Movers</h2>
+
+  <div class="grid" id="pokemonCards"></div>
+
+  <h2 class="section-title">📦 Sealed Product Watchlist</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Pokémon 151 Booster Bundle</h2>
+      <div class="set">Sealed Product</div>
+      <div class="price">WATCH</div>
+      <div class="change">Collector demand remains strong</div>
+      <span class="signal watch">WATCH</span>
+      <div class="reason">Good long-term sealed product candidate if prices cool down.</div>
+      <div class="btns">
+        <a class="btn" target="_blank" href="https://www.ebay.com/sch/i.html?_nkw=pokemon+151+booster+bundle">View Listings</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Evolving Skies Booster Box</h2>
+      <div class="set">Sealed Product</div>
+      <div class="price">HOLD</div>
+      <div class="change">Umbreon demand supports sealed prices</div>
+      <span class="signal hold">HOLD</span>
+      <div class="reason">High-demand set with strong chase card support.</div>
+      <div class="btns">
+        <a class="btn" target="_blank" href="https://www.ebay.com/sch/i.html?_nkw=evolving+skies+booster+box">View Listings</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="premium">
+    <h2>💎 Premium Pokémon Alerts Coming Soon</h2>
+    <p>Unlock price alerts, top movers, scanner tools, sealed product watchlists, and buy/hold/sell signals.</p>
+    <ul>
+      <li>🔥 Heat Score alerts</li>
+      <li>📈 30-day trend tracking</li>
+      <li>🧾 Portfolio watchlist</li>
+      <li>🛒 eBay deal finder</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+const cards = [
+  {
+    name: "Charizard Holo PSA 10",
+    set: "1999 Base Set",
+    price: "$12,500",
+    change: "+14.8%",
+    heat: 96,
+    signal: "BUY",
+    signalClass: "buy",
+    reason: "Vintage demand, iconic character, and strong PSA 10 collector interest.",
+    ebay: "charizard+holo+psa+10+base+set"
+  },
+  {
+    name: "Pikachu Van Gogh",
+    set: "Promo Card",
+    price: "$185",
+    change: "+9.2%",
+    heat: 88,
+    signal: "HOLD",
+    signalClass: "hold",
+    reason: "Limited promo demand and strong collector attention.",
+    ebay: "pikachu+van+gogh+pokemon+card"
+  },
+  {
+    name: "Umbreon VMAX Alt Art",
+    set: "Evolving Skies",
+    price: "$850",
+    change: "+6.7%",
+    heat: 91,
+    signal: "BUY",
+    signalClass: "buy",
+    reason: "Modern chase card with high collector demand.",
+    ebay: "umbreon+vmax+alt+art"
+  },
+  {
+    name: "Lugia Neo Genesis",
+    set: "Neo Genesis",
+    price: "$475",
+    change: "+4.1%",
+    heat: 82,
+    signal: "HOLD",
+    signalClass: "hold",
+    reason: "Vintage legendary Pokémon with steady demand.",
+    ebay: "lugia+neo+genesis+pokemon+card"
+  },
+  {
+    name: "Mewtwo First Edition",
+    set: "WOTC Era",
+    price: "$325",
+    change: "+2.8%",
+    heat: 76,
+    signal: "WATCH",
+    signalClass: "watch",
+    reason: "Recognizable character with long-term nostalgia value.",
+    ebay: "mewtwo+first+edition+pokemon+card"
+  },
+  {
+    name: "Rayquaza VMAX Alt Art",
+    set: "Evolving Skies",
+    price: "$390",
+    change: "+5.6%",
+    heat: 84,
+    signal: "HOLD",
+    signalClass: "hold",
+    reason: "Strong artwork demand and modern collector interest.",
+    ebay: "rayquaza+vmax+alt+art"
+  }
+];
+
+function loadCards() {
+  const container = document.getElementById("pokemonCards");
+
+  cards.forEach(function(card) {
+    const ebayUrl = "https://www.ebay.com/sch/i.html?_nkw=" + card.ebay;
+
+    container.innerHTML +=
+      '<div class="card">' +
+        '<h2>' + card.name + '</h2>' +
+        '<div class="set">' + card.set + '</div>' +
+        '<div class="price">' + card.price + '</div>' +
+        '<div class="change">30-Day Change: ' + card.change + '</div>' +
+        '<span class="signal ' + card.signalClass + '">' + card.signal + '</span>' +
+        '<div class="heat"><b>Heat Score: ' + card.heat + '/100</b><div class="bar"><div class="fill" style="width:' + card.heat + '%"></div></div></div>' +
+        '<div class="reason"><b>Why it’s moving:</b><br>' + card.reason + '</div>' +
+        '<div class="btns">' +
+          '<a class="btn" target="_blank" href="' + ebayUrl + '">View Live Listings</a>' +
+          '<a class="btn secondary" target="_blank" href="' + ebayUrl + '&LH_Sold=1&LH_Complete=1">Sold Prices</a>' +
+        '</div>' +
+      '</div>';
+  });
+}
+
+function searchPokemon() {
+  const q = document.getElementById("search").value.trim();
+
+  if (!q) {
+    alert("Type a Pokémon card name first.");
+    return;
+  }
+
+  window.open("https://www.ebay.com/sch/i.html?_nkw=" + encodeURIComponent(q + " pokemon card"), "_blank");
+}
+
+loadCards();
+</script>
+
+</body>
+</html>
   `);
 });
 app.listen(PORT, () => {
