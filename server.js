@@ -195,7 +195,63 @@ app.get("/api/ebay/search", async (req, res) => {
   }
 });
   
+app.get("/dashboard", async (req, res) => {
+  res.send(`
+  <html>
+  <head>
+    <style>
+      body {
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        padding: 20px;
+      }
+      .card {
+        background: #111827;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+      }
+      a {
+        color: #60a5fa;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
 
+    <h2>📊 Market Dashboard</h2>
+    <div id="content">Loading...</div>
+
+    <script>
+      fetch("/api/dashboard")
+        .then(res => res.json())
+        .then(data => {
+          let html = "";
+
+          html += "<h3>📈 Stocks</h3>";
+          data.stocks.forEach(s => {
+            html += \`<div class="card">\${s.symbol} - $\${s.price} (\${s.percentChange}%)</div>\`;
+          });
+
+          html += "<h3>📰 News</h3>";
+          data.stockNews.slice(0,5).forEach(n => {
+            html += \`<div class="card"><a href="\${n.link}" target="_blank">\${n.title}</a></div>\`;
+          });
+
+          html += "<h3>⚾ Cards</h3>";
+          data.trendingCards.forEach(c => {
+            html += \`<div class="card"><a href="\${c.ebayUrl}" target="_blank">\${c.name}</a></div>\`;
+          });
+
+          document.getElementById("content").innerHTML = html;
+        });
+    </script>
+
+  </body>
+  </html>
+  `);
+});
 app.listen(PORT, () => {
   console.log(`Dashboard API running on port ${PORT}`);
 });
