@@ -4,25 +4,58 @@ const multer = require("multer");
 const OpenAI = require("openai");
 
 const app = express();
-const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 10000;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: OPENAI_API_KEY
+});
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024 }
 });
 
 app.get("/", (req, res) => {
   res.json({
-    status: "AI Card Scanner Backend Running"
+    status: "AI Card Scanner Backend Running",
+    openaiKeyLoaded: !!OPENAI_API_KEY
   });
+});
+
+app.get("/test-openai", async (req, res) => {
+  try {
+    const test = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: "Say scanner ready" }]
+    });
+
+    res.json({
+      success: true,
+      message: test.choices[0].message.content
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: "OpenAI test failed",
+      details: err.message
+    });
+  }
 });
 
 app.post("/scan-card", upload.single("image"), async (req, res) => {
   try {
+    if (!OPENAI_API_KEY) {
+      return res.status(500).json({
+        success: false,
+        error: "OPENAI_API_KEY is missing in Render"
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -33,21 +66,22 @@ app.post("/scan-card", upload.single("image"), async (req, res) => {
     const base64Image = req.file.buffer.toString("base64");
     const mimeType = req.file.mimetype || "image/jpeg";
 
-    const aiResponse = await openai.chat.completions.create({
+    const ai = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       response_format: { type: "json_object" },
       messages: [
         {
           role: "system",
           content:
-            "You identify sports cards, Pokemon cards, and trading cards from images. Return JSON only with: cardName, player, year, brand, set, cardNumber, confidence, searchQuery."
+            "You identify trading cards from images. Return only JSON with cardName, player, year, brand, set, cardNumber, confidence, searchQuery."
         },
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: "Identify this trading card and create the best eBay search query."
+              text:
+                "Identify this sports card, Pokemon card, or collectible trading card. Create the best eBay sold-search query."
             },
             {
               type: "image_url",
@@ -61,39 +95,39 @@ app.post("/scan-card", upload.single("image"), async (req, res) => {
       max_tokens: 500
     });
 
-    const card = JSON.parse(aiResponse.choices[0].message.content);
+    const parsed = JSON.parse(ai.choices[0].message.content);
 
-    const query =
-      card.searchQuery ||
-      card.cardName ||
-      [card.year, card.brand, card.player, card.set, card.cardNumber]
+    const name =
+      parsed.searchQuery ||
+      parsed.cardName ||
+      [parsed.year, parsed.brand, parsed.player, parsed.set, parsed.cardNumber]
         .filter(Boolean)
         .join(" ") ||
-      "Unknown sports card";
+      "Unknown trading card";
 
     const ebayUrl =
       "https://www.ebay.com/sch/i.html?_nkw=" +
-      encodeURIComponent(query) +
+      encodeURIComponent(name) +
       "&LH_Sold=1&LH_Complete=1";
 
     res.json({
       success: true,
-      name: query,
-      cardName: card.cardName || query,
-      player: card.player || "",
-      year: card.year || "",
-      brand: card.brand || "",
-      set: card.set || "",
-      cardNumber: card.cardNumber || "",
-      confidence: card.confidence || "medium",
+      name,
+      cardName: parsed.cardName || name,
+      player: parsed.player || "",
+      year: parsed.year || "",
+      brand: parsed.brand || "",
+      set: parsed.set || "",
+      cardNumber: parsed.cardNumber || "",
+      confidence: parsed.confidence || "medium",
       ebayUrl
     });
   } catch (err) {
-    console.error("AI SCAN ERROR:", err.message);
+    console.error("SCAN ERROR:", err);
 
     res.status(500).json({
       success: false,
-      error: "AI scan failed",
+      error: "Scan failed",
       details: err.message
     });
   }
